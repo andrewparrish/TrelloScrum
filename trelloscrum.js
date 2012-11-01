@@ -13,6 +13,7 @@
 ** Morgan Craft <https://github.com/mgan59>
 ** Frank Geerlings <https://github.com/frankgeerlings>
 ** Cedric Gatay <https://github.com/CedricGatay>
+** Michael Lyons <https://github.com/michaelblyons>
 **
 */
 
@@ -20,12 +21,15 @@
 var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
+//display badges
+var badges = false;
 
 
 //internals
 var filtered = false, //watch for filtered cards
 	reg = /[\(](\x3f|\d*\.?\d+)([\)])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
 	regC = /[\[](\x3f|\d*\.?\d+)([\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+	regLeading = /^\(?(\x3f|\d*\.?\d+)\/(\x3f|\d*\.?\d+)\s*/, //parse regex- accepts leading (3/4) or 3/4
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
@@ -157,7 +161,7 @@ function List(el){
 			var score=0;
 			var attr = _pointsAttr[i];
 			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)});
-			var scoreTruncated = Utils.roundValue(score);			
+			var scoreTruncated = Utils.roundValue(score);
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
 		}
 	};
@@ -177,7 +181,7 @@ function ListCard(el, identifier){
 
 	var points=-1,
 		consumed=identifier!=='points',
-		regexp=consumed?regC:reg,
+		regexp=badges?(consumed?regC:reg):regLeading,
 		parsed,
 		that=this,
 		busy=false,
@@ -200,12 +204,14 @@ function ListCard(el, identifier){
 		if(!$title[0])return;
 		var title=$title[0].text;
 		parsed=title.match(regexp);
-		points=parsed?parsed[1]:-1;
+		points=parsed?(badges?(parsed[1]):consumed?parsed[1]:parsed[2]):-1;
 		if($card.parent()[0]){
-			$title[0].textContent = title.replace(regexp,'');
-			$badge.text(that.points);
-			consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
-			$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+			if(badges){
+				$title[0].textContent = title.replace(regexp,'');
+				$badge.text(that.points);
+				consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
+				$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+			}
 		}
 	};
 
@@ -232,7 +238,9 @@ function showPointPicker() {
 		var text = $text.val();
 
 		// replace our new
-		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+		$text[0].value=badges
+										?(text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text)
+										:(regLeading.test(text)?text.replace(regLeading, '$1/'+value+' '):'0/'+value+' ' + text);
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
