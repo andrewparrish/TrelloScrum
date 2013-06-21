@@ -1,7 +1,7 @@
-TrelloScrum
+Scrum for Trello
 ===========
 
-TrelloScrum adds functionality to the awesome trello.com for use in Scrum projects.
+Scrum for Trello adds functionality to the awesome trello.com for use in Scrum projects.
 
 Trello is the perfect online equivalent of the whiteboard with sticky notes aka the Scrum
 board. One element we use are the storypoints. TrelloScrum gives you the ability to
@@ -10,7 +10,7 @@ make use of story points in Trello.
 Setup
 -----
 
-TrelloScrum is a Chrome extension and you can install it via the Chrome Webstore.
+Scrum for Trello is a Chrome extension and you can install it via the Chrome Webstore.
 
 Or, clone this repository and load the TrelloScrum folder as an unpacked extension.
 
@@ -25,8 +25,6 @@ of the list.
 Every second the story points will be detected and calculated. So changing a number or moving
 a card will be reflected almost immediately.
 
-When a card is considered done, you can hit the "Done" button in the card detail allowing you 
-to remove it from the global list count (it is now counted in the done one).
 
 Credits
 -------
