@@ -21,8 +21,12 @@
 var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
-//display badges
-var badges = false;
+//display badges (defaults to true)
+var badges;
+
+chrome.extension.sendMessage({ options: ['useBadges'] }, function(response) {
+	badges = response.options['useBadges'] !== false && response.options['useBadges'] !== 'false';
+});
 
 
 //internals
