@@ -44,11 +44,8 @@ function round(_val) {return (Math.floor(_val * 100) / 100)};
 //what to do when DOM loads
 $(function(){
 	//watch filtering
-	function updateFilters() {
-		setTimeout(calcListPoints);
-	};
-	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
-	$('.js-input').live('keyup', updateFilters);
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', calcListPoints);
+	$('.js-input').live('keyup', calcListPoints);
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
@@ -64,6 +61,7 @@ $(function(){
 document.body.addEventListener('DOMNodeInserted',function(e){
 	if(e.target.id=='board') setTimeout(calcListPoints);
 	else if($(e.target).hasClass('board-name')) computeTotal();
+	else if($(e.target).hasClass('list')) calcListPoints();
 });
 
 //calculate board totals
@@ -88,11 +86,15 @@ function computeTotal(){
 };
 
 //calculate list totals
-function calcListPoints($el){
-	($el||$('.list')).each(function(){
-		if(!this.list) new List(this);
-		else if(this.list.calc) this.list.calc();
-	})
+var lto;
+function calcListPoints(){
+	clearTimeout(lto);
+	lto = setTimeout(function(){
+		$('.list').each(function(){
+			if(!this.list) new List(this);
+			else if(this.list.calc) this.list.calc();
+		});
+	});
 };
 
 //.list pseudo
@@ -107,7 +109,10 @@ function List(el){
 		to2;
 
 	function readCard($c){
-		if($c.target) $c = $($c.target).filter('.list-card:not(.placeholder)');
+		if($c.target) {
+			if(!/list-card/.test($c.target.className)) return;
+			$c = $($c.target).filter('.list-card:not(.placeholder)');
+		}
 		$c.each(function(){
 			if(!this.listCard) for (var i in _pointsAttr)
 				new ListCard(this,_pointsAttr[i]);
@@ -159,22 +164,23 @@ function ListCard(el, identifier){
 		parsed,
 		that=this,
 		busy=false,
-		to,
-		to2,
-		phref='',
+		ptitle='',
 		$card=$(el),
-		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
+		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
+		to,
+		to2;
 
 	this.refresh=function(){
+		if(busy) return;
+		busy = true;
 		clearTimeout(to);
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
 			var title=$title[0].childNodes[1].textContent;
-			var href = $title.attr('href');
 			if(title) el._title = title;
-			if(href!=phref) {
-				phref = href;
+			if(title!=ptitle) {
+				ptitle = title;
 				parsed=title.match(regexp);
 				points=parsed?(badges?(parsed[1]):consumed?parsed[1]:parsed[2]):-1;
 			}
@@ -194,12 +200,18 @@ function ListCard(el, identifier){
 					var list = $card.closest('.list');
 					if(list[0]) list[0].list.calc();
 				}
+				busy = false;
 			})
 		});
 	};
 
 	this.__defineGetter__('points',function(){
 		return parsed?points:''
+	});
+
+	if(!consumed) el.addEventListener('DOMNodeInserted',function(e){
+		if(/card-short-id/.test(e.target.className) && !busy)
+			that.refresh();
 	});
 
 	setTimeout(that.refresh);
