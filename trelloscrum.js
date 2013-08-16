@@ -30,6 +30,10 @@ chrome.extension.sendMessage({ options: ['useBadges'] }, function(response) {
 	badges = response.options['useBadges'] !== false && response.options['useBadges'] !== 'false';
 });
 
+chrome.extension.sendMessage({ options: ['autoAssign'] }, function(response) {
+	assign = response.options['autoAssign'] !== false && response.options['autoAssign'] !== 'false';
+});
+
 
 //internals
 var filtered = false, //watch for filtered cards

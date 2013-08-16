@@ -3,7 +3,9 @@ function save_options() {
 	var badgeCheck = $('#badges');
 	var useBadges = badgeCheck.is(':checked');
 	localStorage['useBadges'] = useBadges;
-
+	var assignCheck = $('#autoAssign');
+	var autoAssign = assignCheck.is(':checked');
+	localStorage['autoAssign'] = autoAssign;
 	// Update status to let user know options were saved.
 	var status = $('#status');
 	status.text('Options Saved.');
@@ -20,6 +22,12 @@ function restore_options() {
 	}
 	else {
 		$('#badges')[0].checked = false;
+	}
+	var autoAssign = localStorage['autoAssign'];
+	if (autoAssign !== true && autoAssign !== 'true'){
+		$('#autoAssign')[0].checked = false;
+	}else{
+		$('#autoAssign')[0].checked = true;
 	}
 }
 
