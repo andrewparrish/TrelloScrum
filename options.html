@@ -1,9 +1,12 @@
 <html>
 <head>
 <title>Trello Scrum Options</title>
-</head>
 <script src="jquery-1.7.1.min.js"></script>
 <script src="options.js"></script>
+<script src="https://api.trello.com/1/client.js?key=8a2059579ca236994f1946458729f2f"></script>
+<script src="trellooption.js"></script>
+</head>
+
 <body>
 
 <input type="checkbox" id="badges"/> <label for="badges">Use badges on cards</label>
@@ -11,8 +14,19 @@
 <br>
 
 <input type="checkbox" id="autoAssign"/><label for "autoAssign>Auto Assign Cards</label>
+<div id="authorization">
+	<a id="authorizebutton" href="#">Connect to Trello. (Required for AutoAssign)</a>
+	<br>
+	<a id="logoutbutton" href="#">Logout of Trello Authorization</a>
+	<br>
+	<div id="loggedin"></div>
+</div>
 <br>
 <div id="status"></div>
 <button id="save">Save</button>
 </body>
+
+
+
+
 </html>
