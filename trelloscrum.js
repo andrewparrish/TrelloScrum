@@ -26,7 +26,6 @@ var _pointsAttr = ['cpoints', 'points'];
 //display badges (defaults to true)
 var badges;
 
-Trello.authorize(name="Auto Assign")
 
 chrome.extension.sendMessage({ options: ['useBadges'] }, function(response) {
 	badges = response.options['useBadges'] !== false && response.options['useBadges'] !== 'false';
